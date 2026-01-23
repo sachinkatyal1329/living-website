@@ -39,9 +39,15 @@ jobs:
 
             Please read CLAUDE.md for instructions on what you can and cannot modify.
             Then read index.html, interpret the user's request, and make appropriate changes.
-            Commit your changes directly to main.
-          allowed_tools: "Read,Edit,Write,Bash(git commit:*),Bash(git push:*)"
+          allowed_tools: "Read,Edit,Write"
           timeout_minutes: 5
+
+      - name: Auto-merge PR
+        if: steps.claude.outputs.pr_number
+        run: |
+          gh pr merge ${{ steps.claude.outputs.pr_number }} --squash --auto
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Close issue
         run: |
