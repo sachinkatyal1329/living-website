@@ -42,10 +42,10 @@ jobs:
           allowed_tools: "Read,Edit,Write"
           timeout_minutes: 5
 
-      - name: Auto-merge PR
+      - name: Merge PR
         if: steps.claude.outputs.pr_number
         run: |
-          gh pr merge ${{ steps.claude.outputs.pr_number }} --squash --auto
+          gh pr merge ${{ steps.claude.outputs.pr_number }} --squash --delete-branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
