@@ -1,0 +1,60 @@
+name: Claude Edit
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  edit-website:
+    # Only run on issues with the edit-request label
+    if: contains(github.event.issue.labels.*.name, 'edit-request')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract phone number from issue
+        id: extract
+        run: |
+          # Extract phone number from issue body (format: **From:** `+1234567890`)
+          PHONE=$(echo '${{ github.event.issue.body }}' | grep -oP '(?<=\*\*From:\*\* `)[^`]+')
+          echo "phone=$PHONE" >> $GITHUB_OUTPUT
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            A user has requested an edit to the website via SMS.
+
+            Their message:
+            ${{ github.event.issue.body }}
+
+            Please read CLAUDE.md for instructions on what you can and cannot modify.
+            Then read index.html, interpret the user's request, and make appropriate changes.
+            Commit your changes directly to main.
+          allowed_tools: "Read,Edit,Write,Bash(git commit:*),Bash(git push:*)"
+          timeout_minutes: 5
+
+      - name: Close issue
+        run: |
+          gh issue close ${{ github.event.issue.number }} --comment "Edit complete! Changes have been deployed."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for GitHub Pages deployment
+        run: sleep 30
+
+      - name: Send confirmation SMS
+        if: steps.extract.outputs.phone != ''
+        run: |
+          curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${{ secrets.TWILIO_ACCOUNT_SID }}/Messages.json" \
+            --data-urlencode "To=${{ steps.extract.outputs.phone }}" \
+            --data-urlencode "From=${{ secrets.TWILIO_PHONE_NUMBER }}" \
+            --data-urlencode "Body=Your edit is now live! Check it out at ${{ secrets.WEBSITE_URL }}" \
+            -u "${{ secrets.TWILIO_ACCOUNT_SID }}:${{ secrets.TWILIO_AUTH_TOKEN }}"
