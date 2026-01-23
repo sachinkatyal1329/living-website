@@ -42,18 +42,22 @@ jobs:
           allowed_tools: "Read,Edit,Write"
           timeout_minutes: 5
 
-      - name: Merge PR
+      - name: Merge branch into main
         run: |
-          # Find the most recent open PR and merge it
-          PR_NUMBER=$(gh pr list --state open --limit 1 --json number --jq '.[0].number')
-          if [ -n "$PR_NUMBER" ]; then
-            echo "Merging PR #$PR_NUMBER"
-            gh pr merge "$PR_NUMBER" --squash --delete-branch
+          git fetch origin
+          # Find the branch Claude created (most recent non-main branch)
+          BRANCH=$(git branch -r --sort=-committerdate | grep -v 'main\|HEAD' | head -1 | xargs)
+          if [ -n "$BRANCH" ]; then
+            echo "Merging $BRANCH into main"
+            git checkout main
+            git merge "$BRANCH" --no-edit
+            git push origin main
+            # Delete the remote branch
+            REMOTE_BRANCH=${BRANCH#origin/}
+            git push origin --delete "$REMOTE_BRANCH"
           else
-            echo "No open PR found"
+            echo "No branch to merge"
           fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Close issue
         run: |
