@@ -43,9 +43,15 @@ jobs:
           timeout_minutes: 5
 
       - name: Merge PR
-        if: steps.claude.outputs.pr_number
         run: |
-          gh pr merge ${{ steps.claude.outputs.pr_number }} --squash --delete-branch
+          # Find the most recent open PR and merge it
+          PR_NUMBER=$(gh pr list --state open --limit 1 --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Merging PR #$PR_NUMBER"
+            gh pr merge "$PR_NUMBER" --squash --delete-branch
+          else
+            echo "No open PR found"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
