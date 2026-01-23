@@ -2,70 +2,64 @@ name: Claude Edit
 
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
 jobs:
   edit-website:
-    # Only run on issues with the edit-request label
     if: contains(github.event.issue.labels.*.name, 'edit-request')
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
-      id-token: write
-      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract phone number from issue
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Extract phone number
         id: extract
         run: |
-          # Extract phone number from issue body (format: **From:** `+1234567890`)
           PHONE=$(echo '${{ github.event.issue.body }}' | grep -oP '(?<=\*\*From:\*\* `)[^`]+')
           echo "phone=$PHONE" >> $GITHUB_OUTPUT
 
-      - name: Run Claude Code
-        id: claude
-        uses: anthropics/claude-code-action@beta
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          direct_prompt: |
-            A user has requested an edit to the website via SMS.
-
-            Their message:
-            ${{ github.event.issue.body }}
-
-            Please read CLAUDE.md for instructions on what you can and cannot modify.
-            Then read index.html, interpret the user's request, and make appropriate changes.
-          allowed_tools: "Read,Edit,Write"
-          timeout_minutes: 5
-
-      - name: Merge branch into main
+      - name: Run Claude to edit website
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          git fetch origin
-          # Find the branch Claude created (most recent non-main branch)
-          BRANCH=$(git branch -r --sort=-committerdate | grep -v 'main\|HEAD' | head -1 | xargs)
-          if [ -n "$BRANCH" ]; then
-            echo "Merging $BRANCH into main"
-            git checkout main
-            git merge "$BRANCH" --no-edit
-            git push origin main
-            # Delete the remote branch
-            REMOTE_BRANCH=${BRANCH#origin/}
-            git push origin --delete "$REMOTE_BRANCH"
-          else
-            echo "No branch to merge"
-          fi
+          claude --print "$(cat <<'EOF'
+          A user has requested an edit to the website via SMS.
+
+          Their message:
+          ${{ github.event.issue.body }}
+
+          Please read CLAUDE.md for instructions on what you can and cannot modify.
+          Then read index.html, interpret the user's request, and make appropriate changes.
+          Do NOT create any new files. Only edit index.html.
+          EOF
+          )"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "Edit: ${{ github.event.issue.title }}"
+          git push origin main
 
       - name: Close issue
-        run: |
-          gh issue close ${{ github.event.issue.number }} --comment "Edit complete! Changes have been deployed."
+        run: gh issue close ${{ github.event.issue.number }} --comment "Edit complete! Changes are now live."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Wait for GitHub Pages deployment
+      - name: Wait for GitHub Pages
         run: sleep 30
 
       - name: Send confirmation SMS
