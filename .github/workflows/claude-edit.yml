@@ -34,7 +34,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          claude --print "$(cat <<'EOF'
+          claude -p "$(cat <<'EOF'
           A user has requested an edit to the website via SMS.
 
           Their message:
@@ -44,7 +44,7 @@ jobs:
           Then read index.html, interpret the user's request, and make appropriate changes.
           Do NOT create any new files. Only edit index.html.
           EOF
-          )"
+          )" --dangerously-skip-permissions
 
       - name: Commit and push changes
         run: |
