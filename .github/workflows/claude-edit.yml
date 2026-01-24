@@ -2,7 +2,7 @@ name: Claude Edit
 
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 
 jobs:
   edit-website:
