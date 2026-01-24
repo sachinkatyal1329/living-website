@@ -26,8 +26,11 @@ jobs:
 
       - name: Extract phone number
         id: extract
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
-          PHONE=$(echo '${{ github.event.issue.body }}' | grep -oP '(?<=\*\*From:\*\* `)[^`]+')
+          echo "$ISSUE_BODY" > /tmp/issue_body.txt
+          PHONE=$(grep -oP '(?<=\*\*From:\*\* `)[^`]+' /tmp/issue_body.txt || echo "")
           echo "phone=$PHONE" >> $GITHUB_OUTPUT
 
       - name: Run Claude to edit website
