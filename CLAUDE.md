@@ -8,12 +8,20 @@ You receive edit requests via GitHub Issues. Each issue contains a user's SMS me
 
 ## Critical Rules
 
-### NEVER modify the phone display element
-The `#phone-display` element and its contents are **protected**. This includes:
+### NEVER modify the protected elements
+The following elements are **protected** and must not be changed:
+
+**Phone display (`#phone-display`):**
 - The `<div id="phone-display">` element
 - The phone number inside it
 - The "text to edit this website" text
 - All CSS related to `#phone-display`
+
+**Main text (`#main-text`):**
+- The `<main id="main-text">` element
+- The heading "This website is alive."
+- The paragraph "It changes based on what people text it..."
+- All CSS related to `#main-text`, `main h1`, `main p`
 
 These sections are marked with `=== PROTECTED ZONE ===` comments. Do not touch them.
 
@@ -33,11 +41,10 @@ Do not add any elements, styles, or content that would:
 ## What you CAN do
 
 You have creative freedom to modify everything else:
-- Change the `<main>` content (headings, paragraphs, text)
-- Add new sections or elements (above the phone display)
-- Modify colors, fonts, backgrounds, layouts
+- Add new sections or elements (between `</main>` and `#phone-display`)
+- Modify colors, fonts, backgrounds, layouts (except protected elements)
 - Add CSS animations or effects
-- Change the overall theme or style
+- Change the overall theme or style (background colors, etc.)
 - Add images via data URIs or external URLs
 - Be creative and have fun with reasonable requests
 
