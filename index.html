@@ -68,9 +68,78 @@
             color: #444;
         }
         /* === END PROTECTED ZONE === */
+
+        .monkey {
+            position: fixed;
+            font-size: 80px;
+            z-index: 1000;
+            pointer-events: none;
+            transition: transform 0.05s linear;
+        }
     </style>
 </head>
 <body>
+    <div class="monkey" id="monkey1">🐵</div>
+    <div class="monkey" id="monkey2">🐵</div>
+    <script>
+        const size = 80;
+        const emojis = ['🐵', '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐲', '🦄', '🐔', '🐧', '🦆', '🦉', '🦇', '🐺', '🐗', '🐴', '🦓', '🦍', '🐘', '🦏', '🦛', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
+
+        function getRandomEmoji() {
+            return emojis[Math.floor(Math.random() * emojis.length)];
+        }
+
+        function createMonkeyElement() {
+            const monkey = document.createElement('div');
+            monkey.className = 'monkey';
+            monkey.textContent = getRandomEmoji();
+            document.body.appendChild(monkey);
+            return monkey;
+        }
+
+        function createMonkey(monkeyElement = null, startX = null, startY = null) {
+            const monkey = monkeyElement || createMonkeyElement();
+            if (monkeyElement) {
+                monkey.textContent = getRandomEmoji();
+            }
+            let x = startX !== null ? startX : Math.random() * (window.innerWidth - size);
+            let y = startY !== null ? startY : Math.random() * (window.innerHeight - size);
+            let vx = (Math.random() - 0.5) * 8;
+            let vy = (Math.random() - 0.5) * 8;
+
+            function animate() {
+                x += vx;
+                y += vy;
+
+                if (x <= 0 || x >= window.innerWidth - size) {
+                    vx = -vx;
+                    x = x <= 0 ? 0 : window.innerWidth - size;
+                    monkey.textContent = getRandomEmoji();
+                }
+                if (y <= 0 || y >= window.innerHeight - size) {
+                    vy = -vy;
+                    y = y <= 0 ? 0 : window.innerHeight - size;
+                    monkey.textContent = getRandomEmoji();
+                }
+
+                monkey.style.left = x + 'px';
+                monkey.style.top = y + 'px';
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                if (x > window.innerWidth - size) x = window.innerWidth - size;
+                if (y > window.innerHeight - size) y = window.innerHeight - size;
+            });
+        }
+
+        createMonkey(document.getElementById('monkey1'));
+        createMonkey(document.getElementById('monkey2'));
+    </script>
+
     <!-- === PROTECTED ZONE - DO NOT MODIFY THIS ELEMENT === -->
     <main id="main-text">
         <h1>This website is alive.</h1>
