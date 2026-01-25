@@ -74,61 +74,56 @@
         }
         /* === END PROTECTED ZONE === */
 
-        .monkey {
+        .ball {
             position: fixed;
-            font-size: 80px;
+            border-radius: 50%;
             z-index: 1000;
             pointer-events: none;
-            transition: transform 0.05s linear;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2),
+                        inset 5px 5px 15px rgba(255,255,255,0.5),
+                        0 5px 15px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
-    <div class="monkey" id="monkey1">🐵</div>
-    <div class="monkey" id="monkey2">🐵</div>
     <script>
-        const size = 80;
-        const emojis = ['🐵', '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐲', '🦄', '🐔', '🐧', '🦆', '🦉', '🦇', '🐺', '🐗', '🐴', '🦓', '🦍', '🐘', '🦏', '🦛', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'];
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#fd79a8', '#00b894', '#fdcb6e', '#e17055', '#74b9ff'];
 
-        function getRandomEmoji() {
-            return emojis[Math.floor(Math.random() * emojis.length)];
-        }
+        function createBall() {
+            const size = 40 + Math.random() * 60;
+            const ball = document.createElement('div');
+            ball.className = 'ball';
+            ball.style.width = size + 'px';
+            ball.style.height = size + 'px';
+            ball.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            document.body.appendChild(ball);
 
-        function createMonkeyElement() {
-            const monkey = document.createElement('div');
-            monkey.className = 'monkey';
-            monkey.textContent = getRandomEmoji();
-            document.body.appendChild(monkey);
-            return monkey;
-        }
-
-        function createMonkey(monkeyElement = null, startX = null, startY = null) {
-            const monkey = monkeyElement || createMonkeyElement();
-            if (monkeyElement) {
-                monkey.textContent = getRandomEmoji();
-            }
-            let x = startX !== null ? startX : Math.random() * (window.innerWidth - size);
-            let y = startY !== null ? startY : Math.random() * (window.innerHeight - size);
-            let vx = (Math.random() - 0.5) * 8;
-            let vy = (Math.random() - 0.5) * 8;
+            let x = Math.random() * (window.innerWidth - size);
+            let y = Math.random() * (window.innerHeight - size);
+            let vx = (Math.random() - 0.5) * 10;
+            let vy = (Math.random() - 0.5) * 10;
+            const gravity = 0.3;
+            const damping = 0.98;
 
             function animate() {
+                vy += gravity;
                 x += vx;
                 y += vy;
 
                 if (x <= 0 || x >= window.innerWidth - size) {
-                    vx = -vx;
+                    vx = -vx * damping;
                     x = x <= 0 ? 0 : window.innerWidth - size;
-                    monkey.textContent = getRandomEmoji();
                 }
                 if (y <= 0 || y >= window.innerHeight - size) {
-                    vy = -vy;
+                    vy = -vy * damping;
                     y = y <= 0 ? 0 : window.innerHeight - size;
-                    monkey.textContent = getRandomEmoji();
+                    if (y >= window.innerHeight - size && Math.abs(vy) < 2) {
+                        vy = -4 - Math.random() * 4;
+                    }
                 }
 
-                monkey.style.left = x + 'px';
-                monkey.style.top = y + 'px';
+                ball.style.left = x + 'px';
+                ball.style.top = y + 'px';
 
                 requestAnimationFrame(animate);
             }
@@ -141,8 +136,9 @@
             });
         }
 
-        createMonkey(document.getElementById('monkey1'));
-        createMonkey(document.getElementById('monkey2'));
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => createBall(), i * 200);
+        }
     </script>
 
     <!-- === PROTECTED ZONE - DO NOT MODIFY THIS ELEMENT === -->
