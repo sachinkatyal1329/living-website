@@ -74,71 +74,160 @@
         }
         /* === END PROTECTED ZONE === */
 
-        .ball {
+        #pong-canvas {
             position: fixed;
-            border-radius: 50%;
-            z-index: 1000;
-            pointer-events: none;
-            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2),
-                        inset 5px 5px 15px rgba(255,255,255,0.5),
-                        0 5px 15px rgba(0,0,0,0.3);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        main, #phone-display {
+            position: relative;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
+    <canvas id="pong-canvas"></canvas>
+
     <script>
-        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#fd79a8', '#00b894', '#fdcb6e', '#e17055', '#74b9ff'];
+        const canvas = document.getElementById('pong-canvas');
+        const ctx = canvas.getContext('2d');
 
-        function createBall() {
-            const size = 40 + Math.random() * 60;
-            const ball = document.createElement('div');
-            ball.className = 'ball';
-            ball.style.width = size + 'px';
-            ball.style.height = size + 'px';
-            ball.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            document.body.appendChild(ball);
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-            let x = Math.random() * (window.innerWidth - size);
-            let y = Math.random() * (window.innerHeight - size);
-            let vx = (Math.random() - 0.5) * 10;
-            let vy = (Math.random() - 0.5) * 10;
-            const gravity = 0.3;
-            const damping = 0.98;
+        // Pong game state
+        const paddleWidth = 15;
+        const paddleHeight = 100;
+        const ballSize = 15;
 
-            function animate() {
-                vy += gravity;
-                x += vx;
-                y += vy;
+        let ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            dx: 5,
+            dy: 5,
+            speed: 5
+        };
 
-                if (x <= 0 || x >= window.innerWidth - size) {
-                    vx = -vx * damping;
-                    x = x <= 0 ? 0 : window.innerWidth - size;
-                }
-                if (y <= 0 || y >= window.innerHeight - size) {
-                    vy = -vy * damping;
-                    y = y <= 0 ? 0 : window.innerHeight - size;
-                    if (y >= window.innerHeight - size && Math.abs(vy) < 2) {
-                        vy = -4 - Math.random() * 4;
-                    }
-                }
+        let leftPaddle = {
+            x: 30,
+            y: canvas.height / 2 - paddleHeight / 2
+        };
 
-                ball.style.left = x + 'px';
-                ball.style.top = y + 'px';
+        let rightPaddle = {
+            x: canvas.width - 30 - paddleWidth,
+            y: canvas.height / 2 - paddleHeight / 2
+        };
 
-                requestAnimationFrame(animate);
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+            ball.dy = (Math.random() - 0.5) * ball.speed;
+        }
+
+        function updatePaddles() {
+            // Left paddle AI - follows ball
+            const leftPaddleCenter = leftPaddle.y + paddleHeight / 2;
+            if (ball.y < leftPaddleCenter - 10) {
+                leftPaddle.y -= 4;
+            } else if (ball.y > leftPaddleCenter + 10) {
+                leftPaddle.y += 4;
             }
 
-            animate();
+            // Right paddle AI - follows ball
+            const rightPaddleCenter = rightPaddle.y + paddleHeight / 2;
+            if (ball.y < rightPaddleCenter - 10) {
+                rightPaddle.y -= 4;
+            } else if (ball.y > rightPaddleCenter + 10) {
+                rightPaddle.y += 4;
+            }
 
-            window.addEventListener('resize', () => {
-                if (x > window.innerWidth - size) x = window.innerWidth - size;
-                if (y > window.innerHeight - size) y = window.innerHeight - size;
-            });
+            // Keep paddles in bounds
+            leftPaddle.y = Math.max(0, Math.min(canvas.height - paddleHeight, leftPaddle.y));
+            rightPaddle.y = Math.max(0, Math.min(canvas.height - paddleHeight, rightPaddle.y));
         }
 
-        for (let i = 0; i < 8; i++) {
-            setTimeout(() => createBall(), i * 200);
+        function updateBall() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Top and bottom wall collision
+            if (ball.y <= 0 || ball.y >= canvas.height - ballSize) {
+                ball.dy = -ball.dy;
+            }
+
+            // Left paddle collision
+            if (ball.x <= leftPaddle.x + paddleWidth &&
+                ball.y >= leftPaddle.y &&
+                ball.y <= leftPaddle.y + paddleHeight) {
+                ball.dx = Math.abs(ball.dx);
+                const hitPos = (ball.y - leftPaddle.y) / paddleHeight - 0.5;
+                ball.dy += hitPos * 3;
+            }
+
+            // Right paddle collision
+            if (ball.x + ballSize >= rightPaddle.x &&
+                ball.y >= rightPaddle.y &&
+                ball.y <= rightPaddle.y + paddleHeight) {
+                ball.dx = -Math.abs(ball.dx);
+                const hitPos = (ball.y - rightPaddle.y) / paddleHeight - 0.5;
+                ball.dy += hitPos * 3;
+            }
+
+            // Ball out of bounds - restart
+            if (ball.x < -50 || ball.x > canvas.width + 50) {
+                resetBall();
+            }
         }
+
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw center line
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw paddles
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
+            ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
+
+            // Draw ball
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ballSize / 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function gameLoop() {
+            updatePaddles();
+            updateBall();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            rightPaddle.x = canvas.width - 30 - paddleWidth;
+        });
+
+        gameLoop();
     </script>
 
     <!-- === PROTECTED ZONE - DO NOT MODIFY THIS ELEMENT === -->
