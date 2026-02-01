@@ -87,6 +87,7 @@
             width: 100%;
             padding: 2rem;
             margin-top: 2rem;
+            margin-bottom: 140px;
         }
 
         .game-info {
@@ -113,6 +114,7 @@
         #chessboard {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
             gap: 0;
             aspect-ratio: 1;
             width: 100%;
@@ -183,11 +185,41 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+                padding-bottom: 180px;
+            }
+
+            .chess-container {
+                padding: 1rem;
+                margin-bottom: 160px;
+            }
+
             .square {
                 font-size: 2rem;
             }
+
             #chessboard {
-                max-width: 90vw;
+                max-width: min(90vw, calc(100vh - 400px));
+                width: 100%;
+            }
+
+            .game-info {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: landscape) {
+            body {
+                padding-bottom: 140px;
+            }
+
+            .chess-container {
+                margin-bottom: 120px;
+            }
+
+            #chessboard {
+                max-width: min(50vh, 90vw);
             }
         }
 
@@ -323,7 +355,7 @@
     <div class="hello-world">Hello Sachin</div>
     <div class="chess-container">
         <div class="game-info">
-            <div class="game-status" id="game-status">Your turn - Play as White</div>
+            <div class="game-status" id="game-status">Your turn - Play as Black</div>
             <div class="turn-indicator" id="turn-indicator">Click a piece to start</div>
         </div>
         <div id="chessboard"></div>
@@ -339,21 +371,21 @@
             'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
         };
 
-        // Initial board setup
+        // Initial board setup (White pieces on bottom rows 6-7, Black pieces on top rows 0-1)
         let board = [
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
             ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
         ];
 
         let selectedSquare = null;
-        let playerColor = 'white';
-        let currentTurn = 'white';
+        let playerColor = 'black';
+        let currentTurn = 'black';
         let lastMove = null;
         let gameOver = false;
 
@@ -401,7 +433,7 @@
                     updateBoard();
 
                     if (!gameOver) {
-                        currentTurn = 'black';
+                        currentTurn = 'white';
                         updateStatus();
                         setTimeout(makeComputerMove, 500);
                     }
@@ -434,7 +466,7 @@
             if (capturedPiece && capturedPiece.toLowerCase() === 'k') {
                 gameOver = true;
                 document.getElementById('game-status').textContent =
-                    currentTurn === 'white' ? 'You Win!' : 'Computer Wins!';
+                    currentTurn === 'black' ? 'You Win!' : 'Computer Wins!';
             }
         }
 
@@ -448,7 +480,7 @@
             switch (piece.toLowerCase()) {
                 case 'p': // Pawn
                     const direction = isWhite ? -1 : 1;
-                    const startRow = isWhite ? 6 : 1;
+                    const startRow = isWhite ? 1 : 6;
 
                     // Forward move
                     if (board[row + direction]?.[col] === null) {
@@ -531,12 +563,12 @@
         function makeComputerMove() {
             if (gameOver) return;
 
-            // Find all black pieces and their valid moves
+            // Find all white pieces and their valid moves
             const allMoves = [];
             for (let row = 0; row < 8; row++) {
                 for (let col = 0; col < 8; col++) {
                     const piece = board[row][col];
-                    if (piece && piece === piece.toLowerCase()) {
+                    if (piece && piece === piece.toUpperCase()) {
                         const moves = getValidMoves(row, col);
                         moves.forEach(move => {
                             allMoves.push({ fromRow: row, fromCol: col, toRow: move.row, toCol: move.col });
@@ -553,7 +585,7 @@
                     : allMoves[Math.floor(Math.random() * allMoves.length)];
 
                 makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
-                currentTurn = 'white';
+                currentTurn = 'black';
                 updateBoard();
                 updateStatus();
             }
@@ -582,29 +614,38 @@
             if (gameOver) return;
 
             document.getElementById('game-status').textContent =
-                currentTurn === 'white' ? 'Your turn - Play as White' : 'Computer is thinking...';
+                currentTurn === 'black' ? 'Your turn - Play as Black' : 'Computer is thinking...';
             document.getElementById('turn-indicator').textContent =
-                currentTurn === 'white' ? 'Click a piece to move' : 'Please wait...';
+                currentTurn === 'black' ? 'Click a piece to move' : 'Please wait...';
         }
 
         function resetGame() {
             board = [
-                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-                ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-                [null, null, null, null, null, null, null, null],
-                [null, null, null, null, null, null, null, null],
-                [null, null, null, null, null, null, null, null],
-                [null, null, null, null, null, null, null, null],
+                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+                [null, null, null, null, null, null, null, null],
+                [null, null, null, null, null, null, null, null],
+                [null, null, null, null, null, null, null, null],
+                [null, null, null, null, null, null, null, null],
+                ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
             ];
             selectedSquare = null;
-            currentTurn = 'white';
+            currentTurn = 'black';
             lastMove = null;
             gameOver = false;
             updateBoard();
             updateStatus();
         }
+
+        // Handle window resize and orientation changes
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                updateBoard();
+            }, 100);
+        });
 
         // Initialize game
         createBoard();
@@ -626,6 +667,17 @@
     <div id="history-view" class="view">
         <ul class="history-list" id="history-list">
             <!-- HISTORY_ENTRIES -->
+            <li class="history-item">
+    <div class="history-avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+    </div>
+    <div class="history-content">
+        <div class="history-phone">***-***-4099</div>
+        <div class="history-prompt">Fix this game of chess, there are a few issues: the top row is white when it should be black, on mobile the dimensions are not great so sometimes the bottom row gets cut off and you can&#39;t see it and if I rotate my phone then rotate it back I only see a 4x4 grid instead of the whole board. Make sure to audit the board, pieces, and game logic and make sure everything is displayed well so it renders well on both desktop and mobile. Make no mistakes</div>
+    </div>
+</li>
             <li class="history-item">
     <div class="history-avatar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
