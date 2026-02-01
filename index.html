@@ -230,16 +230,19 @@
         .view {
             display: none;
             width: 100%;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px;
         }
 
         .view.active {
-            display: block;
+            display: flex;
         }
 
         #history-view {
             max-width: 600px;
-            margin: 0 auto;
-            padding: 80px 2rem 140px;
+            width: 100%;
+            padding: 20px 2rem 140px;
         }
 
         .history-list {
