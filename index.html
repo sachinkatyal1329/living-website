@@ -22,6 +22,18 @@
             color: #fff;
             padding: 2rem;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        #pong-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3;
+            pointer-events: none;
         }
 
         /* === PROTECTED ZONE - DO NOT MODIFY === */
@@ -341,6 +353,8 @@
     </style>
 </head>
 <body>
+    <canvas id="pong-canvas"></canvas>
+
     <!-- === PROTECTED ZONE - DO NOT MODIFY === -->
     <nav class="site-nav">
         <button class="active" data-view="main-view">Home</button>
@@ -652,6 +666,164 @@
         updateStatus();
     </script>
 
+    <script>
+        // Pong Game - Background Animation
+        const canvas = document.getElementById('pong-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Pong game state
+        const pongState = {
+            ballX: 0,
+            ballY: 0,
+            ballVelX: 5,
+            ballVelY: 5,
+            ballRadius: 8,
+            paddle1Y: 0,
+            paddle2Y: 0,
+            paddleWidth: 15,
+            paddleHeight: 100,
+            paddleSpeed: 4,
+            score1: 0,
+            score2: 0
+        };
+
+        function resetBall() {
+            pongState.ballX = canvas.width / 2;
+            pongState.ballY = canvas.height / 2;
+            pongState.ballVelX = (Math.random() > 0.5 ? 1 : -1) * (4 + Math.random() * 2);
+            pongState.ballVelY = (Math.random() - 0.5) * 8;
+        }
+
+        function resetGame() {
+            pongState.score1 = 0;
+            pongState.score2 = 0;
+            resetBall();
+        }
+
+        resetBall();
+        pongState.paddle1Y = canvas.height / 2 - pongState.paddleHeight / 2;
+        pongState.paddle2Y = canvas.height / 2 - pongState.paddleHeight / 2;
+
+        function updatePong() {
+            // Move ball
+            pongState.ballX += pongState.ballVelX;
+            pongState.ballY += pongState.ballVelY;
+
+            // Ball collision with top/bottom
+            if (pongState.ballY - pongState.ballRadius < 0 ||
+                pongState.ballY + pongState.ballRadius > canvas.height) {
+                pongState.ballVelY = -pongState.ballVelY;
+            }
+
+            // Ball collision with paddles
+            // Left paddle
+            if (pongState.ballX - pongState.ballRadius < pongState.paddleWidth) {
+                if (pongState.ballY > pongState.paddle1Y &&
+                    pongState.ballY < pongState.paddle1Y + pongState.paddleHeight) {
+                    pongState.ballVelX = Math.abs(pongState.ballVelX);
+                    const hitPos = (pongState.ballY - pongState.paddle1Y) / pongState.paddleHeight;
+                    pongState.ballVelY = (hitPos - 0.5) * 10;
+                }
+            }
+
+            // Right paddle
+            if (pongState.ballX + pongState.ballRadius > canvas.width - pongState.paddleWidth) {
+                if (pongState.ballY > pongState.paddle2Y &&
+                    pongState.ballY < pongState.paddle2Y + pongState.paddleHeight) {
+                    pongState.ballVelX = -Math.abs(pongState.ballVelX);
+                    const hitPos = (pongState.ballY - pongState.paddle2Y) / pongState.paddleHeight;
+                    pongState.ballVelY = (hitPos - 0.5) * 10;
+                }
+            }
+
+            // Score points
+            if (pongState.ballX < 0) {
+                pongState.score2++;
+                resetBall();
+                // Auto-restart after 1 second
+                setTimeout(() => {
+                    if (pongState.score2 >= 10) resetGame();
+                }, 1000);
+            }
+            if (pongState.ballX > canvas.width) {
+                pongState.score1++;
+                resetBall();
+                // Auto-restart after 1 second
+                setTimeout(() => {
+                    if (pongState.score1 >= 10) resetGame();
+                }, 1000);
+            }
+
+            // AI for paddles (simple follow the ball)
+            // Left paddle
+            if (pongState.paddle1Y + pongState.paddleHeight / 2 < pongState.ballY - 35) {
+                pongState.paddle1Y += pongState.paddleSpeed;
+            } else if (pongState.paddle1Y + pongState.paddleHeight / 2 > pongState.ballY + 35) {
+                pongState.paddle1Y -= pongState.paddleSpeed;
+            }
+
+            // Right paddle
+            if (pongState.paddle2Y + pongState.paddleHeight / 2 < pongState.ballY - 35) {
+                pongState.paddle2Y += pongState.paddleSpeed;
+            } else if (pongState.paddle2Y + pongState.paddleHeight / 2 > pongState.ballY + 35) {
+                pongState.paddle2Y -= pongState.paddleSpeed;
+            }
+
+            // Keep paddles in bounds
+            pongState.paddle1Y = Math.max(0, Math.min(canvas.height - pongState.paddleHeight, pongState.paddle1Y));
+            pongState.paddle2Y = Math.max(0, Math.min(canvas.height - pongState.paddleHeight, pongState.paddle2Y));
+        }
+
+        function drawPong() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Set color
+            ctx.fillStyle = 'white';
+
+            // Draw center line
+            ctx.setLineDash([10, 15]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw paddles
+            ctx.fillRect(0, pongState.paddle1Y, pongState.paddleWidth, pongState.paddleHeight);
+            ctx.fillRect(canvas.width - pongState.paddleWidth, pongState.paddle2Y,
+                        pongState.paddleWidth, pongState.paddleHeight);
+
+            // Draw ball
+            ctx.beginPath();
+            ctx.arc(pongState.ballX, pongState.ballY, pongState.ballRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw scores
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(pongState.score1, canvas.width / 4, 60);
+            ctx.fillText(pongState.score2, (canvas.width * 3) / 4, 60);
+        }
+
+        function pongGameLoop() {
+            updatePong();
+            drawPong();
+            requestAnimationFrame(pongGameLoop);
+        }
+
+        pongGameLoop();
+    </script>
+
     <!-- === PROTECTED ZONE - DO NOT MODIFY THIS ELEMENT === -->
     <main id="main-text">
         <h1>This website is alive.</h1>
@@ -667,6 +839,17 @@
     <div id="history-view" class="view">
         <ul class="history-list" id="history-list">
             <!-- HISTORY_ENTRIES -->
+            <li class="history-item">
+    <div class="history-avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+    </div>
+    <div class="history-content">
+        <div class="history-phone">***-***-4099</div>
+        <div class="history-prompt">Add a live game of pong to the background so it is always playing and restarting the game automatically and you can see this behind the game of chess</div>
+    </div>
+</li>
             <li class="history-item">
     <div class="history-avatar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
