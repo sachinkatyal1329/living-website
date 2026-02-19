@@ -350,6 +350,48 @@
             color: #fff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
+
+        .dog-circle-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 2rem auto 1rem;
+            z-index: 10;
+        }
+
+        .dog-circle-track {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px dashed rgba(255,255,255,0.3);
+        }
+
+        .dog-runner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 2rem;
+            animation: dogRunCircle 2.5s linear infinite;
+            transform-origin: 0 0;
+            margin-top: -1rem;
+            margin-left: -1rem;
+        }
+
+        @keyframes dogRunCircle {
+            0%   { transform: rotate(0deg)   translateX(90px) rotate(0deg); }
+            50%  { transform: rotate(180deg) translateX(90px) rotate(-180deg) scaleX(-1); }
+            50.001% { transform: rotate(180deg) translateX(90px) rotate(-180deg) scaleX(1); }
+            100% { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
+        }
+
+        .dog-label {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            z-index: 10;
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -824,6 +866,12 @@
         pongGameLoop();
     </script>
 
+    <div class="dog-circle-container">
+        <div class="dog-circle-track"></div>
+        <div class="dog-runner">🐕</div>
+    </div>
+    <div class="dog-label">zoom zoom</div>
+
     <!-- === PROTECTED ZONE - DO NOT MODIFY THIS ELEMENT === -->
     <main id="main-text">
         <h1>This website is alive.</h1>
@@ -839,6 +887,17 @@
     <div id="history-view" class="view">
         <ul class="history-list" id="history-list">
             <!-- HISTORY_ENTRIES -->
+            <li class="history-item">
+    <div class="history-avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+    </div>
+    <div class="history-content">
+        <div class="history-phone">***-***-8993</div>
+        <div class="history-prompt">Sorry I meant not taking a poop I meant a dog running around in a circle</div>
+    </div>
+</li>
             <li class="history-item">
     <div class="history-avatar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
