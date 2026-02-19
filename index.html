@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Game - This website is alive</title>
+    <title>Sky - This website is alive</title>
     <style>
         * {
             margin: 0;
@@ -18,22 +18,144 @@
             align-items: center;
             justify-content: flex-start;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(180deg,
+                #0a1f5e 0%,
+                #1255a0 15%,
+                #1976d2 30%,
+                #2196f3 50%,
+                #64b5f6 70%,
+                #b3d9f7 85%,
+                #dceefb 100%
+            );
             color: #fff;
             padding: 2rem;
             overflow-x: hidden;
             position: relative;
         }
 
-        #pong-canvas {
+        /* Sun */
+        .sun {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0.3;
+            top: 80px;
+            right: 13%;
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, #fffde7 0%, #fff176 30%, #ffee58 55%, #fdd835 80%);
+            border-radius: 50%;
+            box-shadow:
+                0 0 0 12px rgba(253, 216, 53, 0.15),
+                0 0 40px 20px rgba(253, 216, 53, 0.4),
+                0 0 90px 45px rgba(253, 216, 53, 0.2);
+            z-index: 2;
+            animation: sunGlow 5s ease-in-out infinite;
+        }
+
+        @keyframes sunGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 12px rgba(253,216,53,0.15),
+                            0 0 40px 20px rgba(253,216,53,0.4),
+                            0 0 90px 45px rgba(253,216,53,0.2);
+            }
+            50% {
+                box-shadow: 0 0 0 18px rgba(253,216,53,0.18),
+                            0 0 55px 28px rgba(253,216,53,0.5),
+                            0 0 110px 55px rgba(253,216,53,0.25);
+            }
+        }
+
+        /* Clouds */
+        .cloud {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 50px;
+            z-index: 3;
             pointer-events: none;
+            animation: cloudDrift linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 50%;
+        }
+
+        .cloud-1 {
+            width: 210px; height: 56px;
+            top: 13%;
+            animation-duration: 44s;
+            animation-delay: 0s;
+        }
+        .cloud-1::before { width: 95px; height: 95px; top: -48px; left: 28px; }
+        .cloud-1::after  { width: 72px; height: 72px; top: -36px; left: 105px; }
+
+        .cloud-2 {
+            width: 170px; height: 46px;
+            top: 27%;
+            opacity: 0.82;
+            animation-duration: 60s;
+            animation-delay: -18s;
+        }
+        .cloud-2::before { width: 75px; height: 75px; top: -38px; left: 22px; }
+        .cloud-2::after  { width: 58px; height: 58px; top: -29px; left: 80px; }
+
+        .cloud-3 {
+            width: 250px; height: 68px;
+            top: 20%;
+            opacity: 0.78;
+            animation-duration: 52s;
+            animation-delay: -30s;
+        }
+        .cloud-3::before { width: 115px; height: 115px; top: -58px; left: 38px; }
+        .cloud-3::after  { width: 88px;  height: 88px;  top: -44px; left: 130px; }
+
+        .cloud-4 {
+            width: 140px; height: 40px;
+            top: 40%;
+            opacity: 0.68;
+            animation-duration: 38s;
+            animation-delay: -10s;
+        }
+        .cloud-4::before { width: 60px; height: 60px; top: -30px; left: 18px; }
+        .cloud-4::after  { width: 48px; height: 48px; top: -24px; left: 66px; }
+
+        .cloud-5 {
+            width: 185px; height: 50px;
+            top: 34%;
+            opacity: 0.6;
+            animation-duration: 70s;
+            animation-delay: -45s;
+        }
+        .cloud-5::before { width: 82px; height: 82px; top: -41px; left: 25px; }
+        .cloud-5::after  { width: 65px; height: 65px; top: -33px; left: 90px; }
+
+        @keyframes cloudDrift {
+            from { left: -320px; }
+            to   { left: calc(100vw + 320px); }
+        }
+
+        /* Birds */
+        .bird {
+            position: fixed;
+            z-index: 5;
+            font-size: 1.3rem;
+            pointer-events: none;
+            animation: birdFly linear infinite;
+        }
+
+        .bird-1 { top: 17%; animation-duration: 24s; animation-delay: 0s;   left: -50px; }
+        .bird-2 { top: 14%; animation-duration: 30s; animation-delay: -11s; left: -50px; font-size: 1rem; }
+        .bird-3 { top: 21%; animation-duration: 20s; animation-delay: -6s;  left: -50px; font-size: 1.1rem; }
+        .bird-4 { top: 10%; animation-duration: 36s; animation-delay: -20s; left: -50px; font-size: 0.9rem; opacity: 0.8; }
+
+        @keyframes birdFly {
+            0%   { transform: translateX(0)      translateY(0); }
+            20%  { transform: translateX(20vw)   translateY(-10px); }
+            40%  { transform: translateX(40vw)   translateY(5px); }
+            60%  { transform: translateX(60vw)   translateY(-7px); }
+            80%  { transform: translateX(80vw)   translateY(3px); }
+            100% { transform: translateX(calc(100vw + 70px)) translateY(0); }
         }
 
         /* === PROTECTED ZONE - DO NOT MODIFY === */
@@ -92,147 +214,54 @@
             z-index: 10;
         }
 
-        .chess-container {
+        /* Dog running in sky */
+        .dog-circle-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 2.5rem auto 1rem;
+            z-index: 10;
+        }
+
+        .dog-circle-track {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px dashed rgba(255,255,255,0.35);
+        }
+
+        .dog-runner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 2rem;
+            animation: dogRunCircle 2.5s linear infinite;
+            transform-origin: 0 0;
+            margin-top: -1rem;
+            margin-left: -1rem;
+        }
+
+        @keyframes dogRunCircle {
+            0%      { transform: rotate(0deg)   translateX(90px) rotate(0deg); }
+            50%     { transform: rotate(180deg) translateX(90px) rotate(-180deg) scaleX(-1); }
+            50.001% { transform: rotate(180deg) translateX(90px) rotate(-180deg) scaleX(1); }
+            100%    { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
+        }
+
+        .dog-label {
+            text-align: center;
+            color: rgba(255,255,255,0.75);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* Sky spacer so content doesn't start too high */
+        .sky-spacer {
+            height: 2rem;
             position: relative;
             z-index: 10;
-            max-width: 600px;
-            width: 100%;
-            padding: 2rem;
-            margin-top: 2rem;
-            margin-bottom: 140px;
-        }
-
-        .game-info {
-            text-align: center;
-            margin-bottom: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-
-        .game-status {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .turn-indicator {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        #chessboard {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            gap: 0;
-            aspect-ratio: 1;
-            width: 100%;
-            max-width: 560px;
-            margin: 0 auto;
-            border: 4px solid #2c3e50;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-        }
-
-        .square {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.2s;
-        }
-
-        .square.light {
-            background-color: #f0d9b5;
-        }
-
-        .square.dark {
-            background-color: #b58863;
-        }
-
-        .square.selected {
-            background-color: #7fa650 !important;
-        }
-
-        .square.valid-move {
-            background-color: #aad662 !important;
-        }
-
-        .square.last-move {
-            background-color: #cdd26a !important;
-        }
-
-        .square:hover {
-            filter: brightness(0.9);
-        }
-
-        .controls {
-            text-align: center;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin: 0.5rem;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-                padding-bottom: 180px;
-            }
-
-            .chess-container {
-                padding: 1rem;
-                margin-bottom: 160px;
-            }
-
-            .square {
-                font-size: 2rem;
-            }
-
-            #chessboard {
-                max-width: min(90vw, calc(100vh - 400px));
-                width: 100%;
-            }
-
-            .game-info {
-                padding: 1rem;
-            }
-        }
-
-        @media (max-width: 768px) and (orientation: landscape) {
-            body {
-                padding-bottom: 140px;
-            }
-
-            .chess-container {
-                margin-bottom: 120px;
-            }
-
-            #chessboard {
-                max-width: min(50vh, 90vw);
-            }
         }
 
         /* === PROTECTED ZONE - DO NOT MODIFY === */
@@ -340,62 +369,21 @@
             padding: 3rem 0;
         }
         /* === END PROTECTED ZONE === */
-
-        .hello-world {
-            font-size: 3rem;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .dog-circle-container {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            margin: 2rem auto 1rem;
-            z-index: 10;
-        }
-
-        .dog-circle-track {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            border: 3px dashed rgba(255,255,255,0.3);
-        }
-
-        .dog-runner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            font-size: 2rem;
-            animation: dogRunCircle 2.5s linear infinite;
-            transform-origin: 0 0;
-            margin-top: -1rem;
-            margin-left: -1rem;
-        }
-
-        @keyframes dogRunCircle {
-            0%   { transform: rotate(0deg)   translateX(90px) rotate(0deg); }
-            50%  { transform: rotate(180deg) translateX(90px) rotate(-180deg) scaleX(-1); }
-            50.001% { transform: rotate(180deg) translateX(90px) rotate(-180deg) scaleX(1); }
-            100% { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
-        }
-
-        .dog-label {
-            text-align: center;
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            z-index: 10;
-            position: relative;
-        }
     </style>
 </head>
 <body>
-    <canvas id="pong-canvas"></canvas>
+
+    <!-- Sky elements -->
+    <div class="sun"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    <div class="cloud cloud-5"></div>
+    <div class="bird bird-1">🐦</div>
+    <div class="bird bird-2">🐦</div>
+    <div class="bird bird-3">🐦</div>
+    <div class="bird bird-4">🐦</div>
 
     <!-- === PROTECTED ZONE - DO NOT MODIFY === -->
     <nav class="site-nav">
@@ -408,463 +396,7 @@
     <div id="main-view" class="view active">
     <!-- === END PROTECTED ZONE === -->
 
-    <div class="hello-world">Hello Sachin</div>
-    <div class="chess-container">
-        <div class="game-info">
-            <div class="game-status" id="game-status">Your turn - Play as Black</div>
-            <div class="turn-indicator" id="turn-indicator">Click a piece to start</div>
-        </div>
-        <div id="chessboard"></div>
-        <div class="controls">
-            <button class="btn" onclick="resetGame()">New Game</button>
-        </div>
-    </div>
-
-    <script>
-        // Chess piece Unicode symbols
-        const pieces = {
-            'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
-        };
-
-        // Initial board setup (White pieces on bottom rows 6-7, Black pieces on top rows 0-1)
-        let board = [
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
-            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
-        ];
-
-        let selectedSquare = null;
-        let playerColor = 'black';
-        let currentTurn = 'black';
-        let lastMove = null;
-        let gameOver = false;
-
-        function createBoard() {
-            const chessboard = document.getElementById('chessboard');
-            chessboard.innerHTML = '';
-
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const square = document.createElement('div');
-                    square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
-                    square.dataset.row = row;
-                    square.dataset.col = col;
-
-                    if (lastMove &&
-                        ((lastMove.fromRow === row && lastMove.fromCol === col) ||
-                         (lastMove.toRow === row && lastMove.toCol === col))) {
-                        square.classList.add('last-move');
-                    }
-
-                    const piece = board[row][col];
-                    if (piece) {
-                        square.textContent = pieces[piece];
-                    }
-
-                    square.addEventListener('click', () => handleSquareClick(row, col));
-                    chessboard.appendChild(square);
-                }
-            }
-        }
-
-        function handleSquareClick(row, col) {
-            if (gameOver) return;
-            if (currentTurn !== playerColor) return;
-
-            const piece = board[row][col];
-
-            if (selectedSquare) {
-                const validMoves = getValidMoves(selectedSquare.row, selectedSquare.col);
-                const isValidMove = validMoves.some(move => move.row === row && move.col === col);
-
-                if (isValidMove) {
-                    makeMove(selectedSquare.row, selectedSquare.col, row, col);
-                    selectedSquare = null;
-                    updateBoard();
-
-                    if (!gameOver) {
-                        currentTurn = 'white';
-                        updateStatus();
-                        setTimeout(makeComputerMove, 500);
-                    }
-                } else {
-                    selectedSquare = null;
-                    updateBoard();
-                }
-            } else {
-                if (piece && isPlayerPiece(piece)) {
-                    selectedSquare = { row, col };
-                    updateBoard();
-                }
-            }
-        }
-
-        function isPlayerPiece(piece) {
-            return playerColor === 'white' ? piece === piece.toUpperCase() : piece === piece.toLowerCase();
-        }
-
-        function makeMove(fromRow, fromCol, toRow, toCol) {
-            const piece = board[fromRow][fromCol];
-            const capturedPiece = board[toRow][toCol];
-
-            board[toRow][toCol] = piece;
-            board[fromRow][fromCol] = null;
-
-            lastMove = { fromRow, fromCol, toRow, toCol };
-
-            // Check for checkmate/game over
-            if (capturedPiece && capturedPiece.toLowerCase() === 'k') {
-                gameOver = true;
-                document.getElementById('game-status').textContent =
-                    currentTurn === 'black' ? 'You Win!' : 'Computer Wins!';
-            }
-        }
-
-        function getValidMoves(row, col) {
-            const piece = board[row][col];
-            if (!piece) return [];
-
-            const moves = [];
-            const isWhite = piece === piece.toUpperCase();
-
-            switch (piece.toLowerCase()) {
-                case 'p': // Pawn
-                    const direction = isWhite ? -1 : 1;
-                    const startRow = isWhite ? 1 : 6;
-
-                    // Forward move
-                    if (board[row + direction]?.[col] === null) {
-                        moves.push({ row: row + direction, col });
-
-                        // Double move from start
-                        if (row === startRow && board[row + 2 * direction]?.[col] === null) {
-                            moves.push({ row: row + 2 * direction, col });
-                        }
-                    }
-
-                    // Captures
-                    [-1, 1].forEach(dc => {
-                        const targetPiece = board[row + direction]?.[col + dc];
-                        if (targetPiece && (targetPiece === targetPiece.toUpperCase()) !== isWhite) {
-                            moves.push({ row: row + direction, col: col + dc });
-                        }
-                    });
-                    break;
-
-                case 'n': // Knight
-                    [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc]) => {
-                        const newRow = row + dr, newCol = col + dc;
-                        if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-                            const targetPiece = board[newRow][newCol];
-                            if (!targetPiece || (targetPiece === targetPiece.toUpperCase()) !== isWhite) {
-                                moves.push({ row: newRow, col: newCol });
-                            }
-                        }
-                    });
-                    break;
-
-                case 'b': // Bishop
-                    addLineMoves(row, col, [[1,1],[1,-1],[-1,1],[-1,-1]], moves, isWhite);
-                    break;
-
-                case 'r': // Rook
-                    addLineMoves(row, col, [[0,1],[0,-1],[1,0],[-1,0]], moves, isWhite);
-                    break;
-
-                case 'q': // Queen
-                    addLineMoves(row, col, [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]], moves, isWhite);
-                    break;
-
-                case 'k': // King
-                    [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc]) => {
-                        const newRow = row + dr, newCol = col + dc;
-                        if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-                            const targetPiece = board[newRow][newCol];
-                            if (!targetPiece || (targetPiece === targetPiece.toUpperCase()) !== isWhite) {
-                                moves.push({ row: newRow, col: newCol });
-                            }
-                        }
-                    });
-                    break;
-            }
-
-            return moves;
-        }
-
-        function addLineMoves(row, col, directions, moves, isWhite) {
-            directions.forEach(([dr, dc]) => {
-                let newRow = row + dr, newCol = col + dc;
-                while (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-                    const targetPiece = board[newRow][newCol];
-                    if (!targetPiece) {
-                        moves.push({ row: newRow, col: newCol });
-                    } else {
-                        if ((targetPiece === targetPiece.toUpperCase()) !== isWhite) {
-                            moves.push({ row: newRow, col: newCol });
-                        }
-                        break;
-                    }
-                    newRow += dr;
-                    newCol += dc;
-                }
-            });
-        }
-
-        function makeComputerMove() {
-            if (gameOver) return;
-
-            // Find all white pieces and their valid moves
-            const allMoves = [];
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const piece = board[row][col];
-                    if (piece && piece === piece.toUpperCase()) {
-                        const moves = getValidMoves(row, col);
-                        moves.forEach(move => {
-                            allMoves.push({ fromRow: row, fromCol: col, toRow: move.row, toCol: move.col });
-                        });
-                    }
-                }
-            }
-
-            if (allMoves.length > 0) {
-                // Simple AI: prioritize captures, otherwise random move
-                const captureMoves = allMoves.filter(move => board[move.toRow][move.toCol] !== null);
-                const move = captureMoves.length > 0
-                    ? captureMoves[Math.floor(Math.random() * captureMoves.length)]
-                    : allMoves[Math.floor(Math.random() * allMoves.length)];
-
-                makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
-                currentTurn = 'black';
-                updateBoard();
-                updateStatus();
-            }
-        }
-
-        function updateBoard() {
-            createBoard();
-
-            if (selectedSquare) {
-                const square = document.querySelector(
-                    `[data-row="${selectedSquare.row}"][data-col="${selectedSquare.col}"]`
-                );
-                square.classList.add('selected');
-
-                const validMoves = getValidMoves(selectedSquare.row, selectedSquare.col);
-                validMoves.forEach(move => {
-                    const validSquare = document.querySelector(
-                        `[data-row="${move.row}"][data-col="${move.col}"]`
-                    );
-                    validSquare.classList.add('valid-move');
-                });
-            }
-        }
-
-        function updateStatus() {
-            if (gameOver) return;
-
-            document.getElementById('game-status').textContent =
-                currentTurn === 'black' ? 'Your turn - Play as Black' : 'Computer is thinking...';
-            document.getElementById('turn-indicator').textContent =
-                currentTurn === 'black' ? 'Click a piece to move' : 'Please wait...';
-        }
-
-        function resetGame() {
-            board = [
-                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
-                ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                [null, null, null, null, null, null, null, null],
-                [null, null, null, null, null, null, null, null],
-                [null, null, null, null, null, null, null, null],
-                [null, null, null, null, null, null, null, null],
-                ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
-            ];
-            selectedSquare = null;
-            currentTurn = 'black';
-            lastMove = null;
-            gameOver = false;
-            updateBoard();
-            updateStatus();
-        }
-
-        // Handle window resize and orientation changes
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                updateBoard();
-            }, 100);
-        });
-
-        // Initialize game
-        createBoard();
-        updateStatus();
-    </script>
-
-    <script>
-        // Pong Game - Background Animation
-        const canvas = document.getElementById('pong-canvas');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        // Pong game state
-        const pongState = {
-            ballX: 0,
-            ballY: 0,
-            ballVelX: 5,
-            ballVelY: 5,
-            ballRadius: 8,
-            paddle1Y: 0,
-            paddle2Y: 0,
-            paddleWidth: 15,
-            paddleHeight: 100,
-            paddleSpeed: 4,
-            score1: 0,
-            score2: 0
-        };
-
-        function resetBall() {
-            pongState.ballX = canvas.width / 2;
-            pongState.ballY = canvas.height / 2;
-            pongState.ballVelX = (Math.random() > 0.5 ? 1 : -1) * (4 + Math.random() * 2);
-            pongState.ballVelY = (Math.random() - 0.5) * 8;
-        }
-
-        function resetGame() {
-            pongState.score1 = 0;
-            pongState.score2 = 0;
-            resetBall();
-        }
-
-        resetBall();
-        pongState.paddle1Y = canvas.height / 2 - pongState.paddleHeight / 2;
-        pongState.paddle2Y = canvas.height / 2 - pongState.paddleHeight / 2;
-
-        function updatePong() {
-            // Move ball
-            pongState.ballX += pongState.ballVelX;
-            pongState.ballY += pongState.ballVelY;
-
-            // Ball collision with top/bottom
-            if (pongState.ballY - pongState.ballRadius < 0 ||
-                pongState.ballY + pongState.ballRadius > canvas.height) {
-                pongState.ballVelY = -pongState.ballVelY;
-            }
-
-            // Ball collision with paddles
-            // Left paddle
-            if (pongState.ballX - pongState.ballRadius < pongState.paddleWidth) {
-                if (pongState.ballY > pongState.paddle1Y &&
-                    pongState.ballY < pongState.paddle1Y + pongState.paddleHeight) {
-                    pongState.ballVelX = Math.abs(pongState.ballVelX);
-                    const hitPos = (pongState.ballY - pongState.paddle1Y) / pongState.paddleHeight;
-                    pongState.ballVelY = (hitPos - 0.5) * 10;
-                }
-            }
-
-            // Right paddle
-            if (pongState.ballX + pongState.ballRadius > canvas.width - pongState.paddleWidth) {
-                if (pongState.ballY > pongState.paddle2Y &&
-                    pongState.ballY < pongState.paddle2Y + pongState.paddleHeight) {
-                    pongState.ballVelX = -Math.abs(pongState.ballVelX);
-                    const hitPos = (pongState.ballY - pongState.paddle2Y) / pongState.paddleHeight;
-                    pongState.ballVelY = (hitPos - 0.5) * 10;
-                }
-            }
-
-            // Score points
-            if (pongState.ballX < 0) {
-                pongState.score2++;
-                resetBall();
-                // Auto-restart after 1 second
-                setTimeout(() => {
-                    if (pongState.score2 >= 10) resetGame();
-                }, 1000);
-            }
-            if (pongState.ballX > canvas.width) {
-                pongState.score1++;
-                resetBall();
-                // Auto-restart after 1 second
-                setTimeout(() => {
-                    if (pongState.score1 >= 10) resetGame();
-                }, 1000);
-            }
-
-            // AI for paddles (simple follow the ball)
-            // Left paddle
-            if (pongState.paddle1Y + pongState.paddleHeight / 2 < pongState.ballY - 35) {
-                pongState.paddle1Y += pongState.paddleSpeed;
-            } else if (pongState.paddle1Y + pongState.paddleHeight / 2 > pongState.ballY + 35) {
-                pongState.paddle1Y -= pongState.paddleSpeed;
-            }
-
-            // Right paddle
-            if (pongState.paddle2Y + pongState.paddleHeight / 2 < pongState.ballY - 35) {
-                pongState.paddle2Y += pongState.paddleSpeed;
-            } else if (pongState.paddle2Y + pongState.paddleHeight / 2 > pongState.ballY + 35) {
-                pongState.paddle2Y -= pongState.paddleSpeed;
-            }
-
-            // Keep paddles in bounds
-            pongState.paddle1Y = Math.max(0, Math.min(canvas.height - pongState.paddleHeight, pongState.paddle1Y));
-            pongState.paddle2Y = Math.max(0, Math.min(canvas.height - pongState.paddleHeight, pongState.paddle2Y));
-        }
-
-        function drawPong() {
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Set color
-            ctx.fillStyle = 'white';
-
-            // Draw center line
-            ctx.setLineDash([10, 15]);
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0);
-            ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Draw paddles
-            ctx.fillRect(0, pongState.paddle1Y, pongState.paddleWidth, pongState.paddleHeight);
-            ctx.fillRect(canvas.width - pongState.paddleWidth, pongState.paddle2Y,
-                        pongState.paddleWidth, pongState.paddleHeight);
-
-            // Draw ball
-            ctx.beginPath();
-            ctx.arc(pongState.ballX, pongState.ballY, pongState.ballRadius, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Draw scores
-            ctx.font = 'bold 48px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(pongState.score1, canvas.width / 4, 60);
-            ctx.fillText(pongState.score2, (canvas.width * 3) / 4, 60);
-        }
-
-        function pongGameLoop() {
-            updatePong();
-            drawPong();
-            requestAnimationFrame(pongGameLoop);
-        }
-
-        pongGameLoop();
-    </script>
+    <div class="sky-spacer"></div>
 
     <div class="dog-circle-container">
         <div class="dog-circle-track"></div>
@@ -887,6 +419,17 @@
     <div id="history-view" class="view">
         <ul class="history-list" id="history-list">
             <!-- HISTORY_ENTRIES -->
+            <li class="history-item">
+    <div class="history-avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+    </div>
+    <div class="history-content">
+        <div class="history-phone">***-***-8993</div>
+        <div class="history-prompt">Make it a picture of the sky</div>
+    </div>
+</li>
             <li class="history-item">
     <div class="history-avatar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
